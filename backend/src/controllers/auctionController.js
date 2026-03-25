@@ -551,6 +551,20 @@ export const payAndClaimNFT = async (req, res) => {
       })
       .eq('nftoken_id', auction.nftoken_id);
 
+    // Create maturity payment record so investor can collect at maturity
+    const nft = auction.NFTOKEN;
+    if (nft) {
+      await supabase.from('MATURITY_PAYMENT').insert({
+        nftoken_id:       auction.nftoken_id,
+        debtor_address:   nft.created_by,   // original invoice issuer owes at maturity
+        creditor_address: address,           // investor is owed the face value
+        payment_amount:   nft.face_value,
+        maturity_date:    nft.maturity_date,
+        check_status:     'pending',
+      });
+      console.log('  ✅ Maturity payment record created');
+    }
+
     console.log('  ✅ Payment processed and NFT claimed successfully');
 
     res.json({

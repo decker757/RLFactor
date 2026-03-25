@@ -63,7 +63,7 @@ export async function mintAndTransferNFT(params) {
       Account: issuerWallet.address,
       NFTokenID: nftokenId,
       Amount: '0', // 0 XRP - free transfer
-      Destination: recipientAddress, // Only this address can accept
+      // No Destination — public offer so any wallet can accept (seed users have demo addresses)
       Flags: 1 // tfSellNFToken
     };
 

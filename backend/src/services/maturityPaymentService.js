@@ -331,7 +331,7 @@ export async function getPendingPaymentsByDebtor(debtorAddress) {
 
 /**
  * Get maturity payments awaiting collection by creditor
- * Used by frontend to show Checks that can be cashed
+ * Used by frontend to show all outstanding payments (pending, check created, or completed)
  */
 export async function getPaymentsAwaitingCollection(creditorAddress) {
   try {
@@ -342,8 +342,8 @@ export async function getPaymentsAwaitingCollection(creditorAddress) {
         NFTOKEN(*)
       `)
       .eq('creditor_address', creditorAddress)
-      .eq('check_status', 'created')  // Check created but not yet cashed
-      .order('check_created_at', { ascending: true });
+      .in('check_status', ['pending', 'created', 'completed'])
+      .order('maturity_date', { ascending: true });
 
     if (error) {
       throw new Error(`Failed to fetch payments awaiting collection: ${error.message}`);

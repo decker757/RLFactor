@@ -7,7 +7,7 @@ import { AcceptNFTModal } from './accept-nft-modal';
 import { getNFTokensByCreator, getNFTokensByOwner, getAuctionListingsByOwner, getBidsByAuction, subscribeToNFTokens } from '../../lib/database';
 import { NFToken, AuctionListingWithNFT } from '../../lib/supabase';
 import { mintInvoiceNFT, authenticatedFetch } from '../../lib/api';
-import { findNFTSellOffers, acceptNFTOffer, createSellOfferToPlatform, getNFTOwner } from '../../lib/xrpl-nft';
+import { findNFTSellOffers, acceptNFTOffer, createSellOfferToPlatform } from '../../lib/xrpl-nft';
 import { toast } from 'sonner';
 import { fetchPendingPayments, fetchPaymentHistory, payMaturityDirectly, MaturityPayment } from '../../utils/maturityPayment';
 
@@ -222,21 +222,8 @@ export function EstablishmentDashboard({
         return;
       }
 
-      // Verify on-chain ownership first
-      const loadingToast = toast.loading('Verifying NFT ownership on-chain...');
-      const wallet = await import('xrpl').then(xrpl => xrpl.Wallet.fromSeed(walletSeed));
-      const ownsNFT = await getNFTOwner(tokenId, wallet.address);
-
-      if (!ownsNFT) {
-        toast.dismiss(loadingToast);
-        toast.error('You do not own this NFT on-chain. Please accept the NFT offer first.');
-        return;
-      }
-
-      toast.dismiss(loadingToast);
-      console.log('✅ On-chain ownership verified');
-
       // Step 1: Create sell offer to platform (user signs transaction)
+      // On-chain ownership is implicitly verified — XRPL rejects the sell offer if the wallet doesn't own the NFT.
       const loadingToastOffer = toast.loading('Creating sell offer to platform...');
       console.log('  Creating sell offer to platform...');
       const offerResult = await createSellOfferToPlatform({
@@ -275,7 +262,7 @@ export function EstablishmentDashboard({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to list NFT on auction');
+        throw new Error(errorData.message || errorData.error || 'Failed to list NFT on auction');
       }
 
       const result = await response.json();

@@ -509,22 +509,36 @@ export function CustomerDashboard({
               paymentsToCollect.length > 0 ? (
                 <div className="space-y-4">
                   {paymentsToCollect.map((payment) => {
-                    const checkCreatedDate = new Date(payment.check_created_at || '');
+                    const isCompleted = payment.check_status === 'completed';
+                    const isCreated = payment.check_status === 'created';
+                    const isPending = payment.check_status === 'pending';
 
                     return (
-                      <div key={payment.payment_id} className="p-6 bg-gray-800/50 border border-gray-700 rounded-lg">
+                      <div key={payment.payment_id} className={`p-6 bg-gray-800/50 border rounded-lg ${isCompleted ? 'border-green-900/30' : 'border-gray-700'}`}>
                         <div className="flex items-start justify-between mb-4">
                           <div>
                             <div className="text-white font-medium mb-1">
                               {payment.NFTOKEN?.invoice_number || 'Invoice NFT'}
                             </div>
                             <div className="text-sm text-gray-400">
-                              Payment from: {payment.debtor_address.substring(0, 15)}...
+                              Issuer: {payment.debtor_address.substring(0, 15)}...
                             </div>
                           </div>
-                          <span className="px-3 py-1 rounded-full text-xs bg-green-950/50 text-green-400 border border-green-900/50">
-                            Ready to Collect
-                          </span>
+                          {isCompleted && (
+                            <span className="px-3 py-1 rounded-full text-xs bg-green-950/50 text-green-400 border border-green-900/50">
+                              Payment Received
+                            </span>
+                          )}
+                          {isCreated && (
+                            <span className="px-3 py-1 rounded-full text-xs bg-blue-950/50 text-blue-400 border border-blue-900/50">
+                              Ready to Collect
+                            </span>
+                          )}
+                          {isPending && (
+                            <span className="px-3 py-1 rounded-full text-xs bg-yellow-950/50 text-yellow-400 border border-yellow-900/50">
+                              Awaiting Payment
+                            </span>
+                          )}
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -535,39 +549,55 @@ export function CustomerDashboard({
                             </div>
                           </div>
                           <div>
-                            <div className="text-sm text-gray-400 mb-1">Check Created</div>
+                            <div className="text-sm text-gray-400 mb-1">Maturity Date</div>
                             <div className="text-white">
-                              {checkCreatedDate.toLocaleDateString()}
+                              {new Date(payment.maturity_date).toLocaleDateString()}
                             </div>
                           </div>
                           <div>
-                            <div className="text-sm text-gray-400 mb-1">Check ID</div>
-                            <div className="text-white text-sm font-mono">
-                              {payment.xrpl_check_id?.substring(0, 20)}...
+                            <div className="text-sm text-gray-400 mb-1">Status</div>
+                            <div className="text-white text-sm">
+                              {isCompleted ? 'Paid directly on XRPL' : isCreated ? 'Check created on XRPL' : 'Waiting for issuer'}
                             </div>
                           </div>
                         </div>
 
-                        <div className="mb-4 p-3 bg-green-950/30 border border-green-900/50 rounded-lg">
-                          <p className="text-sm text-green-400">
-                            <strong>Payment Ready:</strong> The debtor has created a Check for {payment.payment_amount.toLocaleString()} RLUSD. Cash it to receive your payment.
-                          </p>
-                        </div>
+                        {isCompleted && (
+                          <div className="p-3 bg-green-950/30 border border-green-900/50 rounded-lg">
+                            <p className="text-sm text-green-400">
+                              <strong>Payment Complete:</strong> {payment.payment_amount.toLocaleString()} RLUSD has been sent directly to your wallet by the issuer.
+                            </p>
+                          </div>
+                        )}
 
-                        <div className="pt-4 border-t border-gray-700">
-                          <button
-                            onClick={() => handleCashCheck(payment)}
-                            disabled={cashingCheckFor === payment.payment_id}
-                            className="px-6 py-3 bg-linear-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {cashingCheckFor === payment.payment_id
-                              ? 'Cashing Check...'
-                              : `Cash Check (${payment.payment_amount.toLocaleString()} RLUSD)`}
-                          </button>
-                          <p className="text-xs text-gray-500 mt-2">
-                            This will cash the XRPL Check and transfer {payment.payment_amount.toLocaleString()} RLUSD to your wallet.
-                          </p>
-                        </div>
+                        {isPending && (
+                          <div className="p-3 bg-yellow-950/30 border border-yellow-900/50 rounded-lg">
+                            <p className="text-sm text-yellow-400">
+                              <strong>Waiting for Issuer:</strong> The NFT issuer has been notified to send {payment.payment_amount.toLocaleString()} RLUSD to your wallet.
+                            </p>
+                          </div>
+                        )}
+
+                        {isCreated && (
+                          <>
+                            <div className="mb-4 p-3 bg-blue-950/30 border border-blue-900/50 rounded-lg">
+                              <p className="text-sm text-blue-400">
+                                <strong>Check Ready:</strong> The issuer has created an XRPL Check for {payment.payment_amount.toLocaleString()} RLUSD. Cash it to receive your payment.
+                              </p>
+                            </div>
+                            <div className="pt-4 border-t border-gray-700">
+                              <button
+                                onClick={() => handleCashCheck(payment)}
+                                disabled={cashingCheckFor === payment.payment_id}
+                                className="px-6 py-3 bg-linear-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {cashingCheckFor === payment.payment_id
+                                  ? 'Cashing Check...'
+                                  : `Cash Check (${payment.payment_amount.toLocaleString()} RLUSD)`}
+                              </button>
+                            </div>
+                          </>
+                        )}
                       </div>
                     );
                   })}
@@ -577,7 +607,7 @@ export function CustomerDashboard({
                   <DollarSign className="w-16 h-16 text-gray-700 mx-auto mb-4" />
                   <p className="text-gray-400 mb-4">No payments to collect</p>
                   <p className="text-xs text-gray-500">
-                    Payments will appear here when NFTs you own reach maturity and debtors create payment Checks
+                    Payments will appear here when NFTs you own reach maturity
                   </p>
                 </div>
               )

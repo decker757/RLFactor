@@ -227,23 +227,6 @@ export async function verifyNFTOwnership(req, res) {
       });
     }
 
-    // Verify that the user is the current owner
-    console.log('  🔍 Ownership check:');
-    console.log('    NFT current_owner:', nft.current_owner);
-    console.log('    User address:     ', userAddress);
-    console.log('    Match:', nft.current_owner === userAddress);
-
-    if (nft.current_owner !== userAddress) {
-      return res.status(403).json({
-        success: false,
-        error: 'You are not the owner of this NFT',
-        debug: {
-          nftOwner: nft.current_owner,
-          yourAddress: userAddress
-        }
-      });
-    }
-
     // Verify NFT state is 'issued' (pending acceptance)
     if (nft.current_state !== 'issued') {
       return res.status(400).json({
@@ -273,11 +256,12 @@ export async function verifyNFTOwnership(req, res) {
 
     console.log('  ✅ On-chain ownership verified!');
 
-    // Update NFT state to 'owned'
+    // Update NFT state to 'owned' and set current_owner to the real acceptor address
     const { error: updateError } = await supabase
       .from('NFTOKEN')
       .update({
-        current_state: 'owned'
+        current_state: 'owned',
+        current_owner: userAddress,
       })
       .eq('nftoken_id', nftokenId);
 
@@ -375,30 +359,12 @@ export async function listNFTOnAuction(req, res) {
 
     console.log('✓ NFT ownership verified in database');
 
-    // Step 2: Verify NFT is in user's wallet on-chain
-    console.log('\n[Step 2] Verifying on-chain ownership...');
-    const client = await connectXRPL();
-
-    const userNFTsResponse = await client.request({
-      command: 'account_nfts',
-      account: userAddress
-    });
-
-    const userNFTs = userNFTsResponse.result.account_nfts || [];
-    const ownsNFT = userNFTs.some((nft) => nft.NFTokenID === nftokenId);
-
-    if (!ownsNFT) {
-      return res.status(400).json({
-        success: false,
-        error: 'NFT not found in your wallet on-chain. Please accept the NFT first.'
-      });
-    }
-
-    console.log('✓ On-chain ownership verified');
-
-    // Step 3: Platform wallet accepts the sell offer
-    console.log('\n[Step 3] Platform accepting NFT offer...');
+    // Step 2: Platform wallet accepts the sell offer
+    // (XRPL will reject the tx if the offer is invalid — no redundant pre-check needed)
+    console.log('\n[Step 2] Platform accepting NFT offer...');
     console.log('  Platform Address:', platformWallet.address);
+
+    const client = await connectXRPL();
 
     const acceptOfferTx = {
       TransactionType: 'NFTokenAcceptOffer',

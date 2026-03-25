@@ -14,6 +14,9 @@
 
 import './src/init.js';
 import { createClient } from '@supabase/supabase-js';
+import xrpl from 'xrpl';
+import fetch from 'node-fetch';
+import { writeFileSync } from 'fs';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -23,15 +26,20 @@ const supabase = createClient(
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-function deriveAddress(seed) {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    const char = seed.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
+/** Fund an address via XRPL Testnet faucet. Retries once on failure. */
+async function fundViaFaucet(address) {
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const res = await fetch('https://faucet.altnet.rippletest.net/accounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ destination: address }),
+      });
+      if (res.ok) return true;
+    } catch (_) {}
+    if (attempt < 2) await new Promise(r => setTimeout(r, 2000));
   }
-  const h = Math.abs(hash).toString(36).toUpperCase();
-  return `r${h}${seed.slice(1, 4).toUpperCase()}${h.slice(0, 20)}`;
+  return false;
 }
 
 function daysFromNow(days) {
@@ -103,37 +111,41 @@ const IMAGES = [
 // ── 1. Users ───────────────────────────────────────────────────────────────
 
 async function seedUsers() {
-  console.log('👤  Seeding users...');
+  console.log('👤  Seeding users (generating real XRPL wallets + funding)...');
 
-  const users = [];
+  const users    = [];
+  const wallets  = []; // { username, role, address, seed, funded }
 
-  // 1 admin
-  users.push({
-    publicKey: deriveAddress('sTestKeyADMIN000000000001'),
-    username:  'Platform Admin',
-    role:      'admin',
-  });
+  const generate = (username, role) => {
+    const wallet = xrpl.Wallet.generate();
+    users.push({ publicKey: wallet.address, username, role });
+    wallets.push({ username, role, address: wallet.address, seed: wallet.seed, funded: false });
+  };
 
-  // 25 investors
-  for (let i = 0; i < 25; i++) {
-    users.push({
-      publicKey: deriveAddress(`sTestKeyINVESTOR${String(i).padStart(3, '0')}`),
-      username:  INVESTOR_NAMES[i],
-      role:      'investor',
-    });
+  // Admin uses the real platform wallet from .env so NFT ownership transfers work
+  const platformWallet = xrpl.Wallet.fromSeed(process.env.PLATFORM_WALLET_SEED);
+  users.push({ publicKey: platformWallet.address, username: 'Platform Admin', role: 'admin' });
+  wallets.push({ username: 'Platform Admin', role: 'admin', address: platformWallet.address, seed: process.env.PLATFORM_WALLET_SEED, funded: true });
+
+  for (let i = 0; i < 25; i++) generate(INVESTOR_NAMES[i],  'investor');
+  for (let i = 0; i < 24; i++) generate(BUSINESS_NAMES[i], 'business');
+
+  // Fund all wallets via testnet faucet (throttled to avoid rate limits)
+  console.log(`    Funding ${wallets.length} wallets via testnet faucet...`);
+  for (const w of wallets) {
+    w.funded = await fundViaFaucet(w.address);
+    process.stdout.write(w.funded ? '.' : 'x');
+    await new Promise(r => setTimeout(r, 600)); // ~600ms between requests
   }
+  console.log();
 
-  // 24 businesses
-  for (let i = 0; i < 24; i++) {
-    users.push({
-      publicKey: deriveAddress(`sTestKeyBUSINESS${String(i).padStart(3, '0')}`),
-      username:  BUSINESS_NAMES[i],
-      role:      'business',
-    });
-  }
+  // Save credentials to file for demo logins
+  const credentialsPath = new URL('./seed-wallets.json', import.meta.url).pathname;
+  writeFileSync(credentialsPath, JSON.stringify(wallets, null, 2));
+  console.log(`    ✓ Wallet credentials saved → seed-wallets.json`);
 
   await upsert('USER', users, 'publicKey');
-  console.log(`    ✓ ${users.length} users (25 investors, 24 businesses, 1 admin)`);
+  console.log(`    ✓ ${users.length} users upserted (25 investors, 24 businesses, 1 admin)`);
   return users;
 }
 
@@ -372,13 +384,129 @@ async function seedAuditLog(users) {
   console.log(`    ✓ ${entries.length} audit log entries`);
 }
 
+// ── 0. Teardown ────────────────────────────────────────────────────────────
+
+async function teardown() {
+  console.log('🗑️   Clearing previous seed data...');
+
+  // Identify seed user public keys so we can scope the delete
+  const seedUsernames = ['Platform Admin', ...INVESTOR_NAMES, ...BUSINESS_NAMES];
+
+  const { data: seedUsers } = await supabase
+    .from('USER')
+    .select('publicKey')
+    .in('username', seedUsernames);
+
+  if (!seedUsers?.length) {
+    console.log('    ↩  No previous seed data found, skipping teardown.');
+    return;
+  }
+
+  const pks = seedUsers.map(u => u.publicKey);
+
+  // Delete in FK-safe order (children first)
+  await supabase.from('AUDIT_LOG').delete().in('actor_address', pks);
+  await supabase.from('MATURITY_PAYMENT').delete().in('debtor_address', pks);
+  await supabase.from('MATURITY_PAYMENT').delete().in('creditor_address', pks);
+
+  // Get auction IDs owned by seed users so we can delete their bids
+  const { data: listings } = await supabase
+    .from('AUCTIONLISTING')
+    .select('aid')
+    .in('original_owner', pks);
+  if (listings?.length) {
+    const aids = listings.map(l => l.aid);
+    await supabase.from('AUCTIONBIDS').delete().in('aid', aids);
+  }
+  await supabase.from('AUCTIONBIDS').delete().in('bid_by', pks);
+  await supabase.from('AUCTIONLISTING').delete().in('original_owner', pks);
+  await supabase.from('NFTOKEN').delete().in('created_by', pks);
+  await supabase.from('USER').delete().in('publicKey', pks);
+
+  console.log(`    ✓ Cleared seed data for ${pks.length} users`);
+}
+
 // ── Main ───────────────────────────────────────────────────────────────────
+
+// ── 7. RLUSD distribution ──────────────────────────────────────────────────
+
+async function seedRLUSD(wallets) {
+  console.log('💵  Seeding RLUSD balances for investors...');
+
+  const RLUSD_ISSUER   = process.env.HOTEL_SEED
+    ? xrpl.Wallet.fromSeed(process.env.HOTEL_SEED).address
+    : null;
+
+  if (!RLUSD_ISSUER) {
+    console.log('    ↩  HOTEL_SEED not set, skipping RLUSD distribution.');
+    return;
+  }
+
+  const hotelWallet    = xrpl.Wallet.fromSeed(process.env.HOTEL_SEED);
+  const RLUSD_CURRENCY = '524C555344000000000000000000000000000000';
+  const RLUSD_AMOUNT   = '100000'; // 100,000 RLUSD per investor
+
+  const client = new xrpl.Client('wss://s.altnet.rippletest.net:51233');
+  await client.connect();
+
+  // All funded non-admin wallets need trust lines (businesses receive RLUSD from auction payouts)
+  // Investors also get a 100k RLUSD balance for bidding
+  const eligible = wallets.filter(w => w.role !== 'admin' && w.funded);
+  let trustLines = 0;
+  let rlusdFunded = 0;
+
+  for (const w of eligible) {
+    try {
+      const wallet = xrpl.Wallet.fromSeed(w.seed);
+
+      // Set trust line to RLUSD issuer (needed to receive RLUSD)
+      const trustTx = await client.autofill({
+        TransactionType: 'TrustSet',
+        Account: wallet.address,
+        LimitAmount: { currency: RLUSD_CURRENCY, issuer: RLUSD_ISSUER, value: '1000000' },
+      });
+      const signedTrust = wallet.sign(trustTx);
+      await client.submitAndWait(signedTrust.tx_blob);
+      trustLines++;
+
+      // Investors get RLUSD balance for bidding
+      if (w.role === 'investor') {
+        const payTx = await client.autofill({
+          TransactionType: 'Payment',
+          Account: hotelWallet.address,
+          Destination: wallet.address,
+          Amount: { currency: RLUSD_CURRENCY, issuer: RLUSD_ISSUER, value: RLUSD_AMOUNT },
+        });
+        const signedPay = hotelWallet.sign(payTx);
+        await client.submitAndWait(signedPay.tx_blob);
+        rlusdFunded++;
+      }
+
+      process.stdout.write('.');
+    } catch (err) {
+      process.stdout.write('x');
+    }
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  await client.disconnect();
+  console.log(`\n    ✓ ${trustLines}/${eligible.length} trust lines set, ${rlusdFunded} investors funded with ${RLUSD_AMOUNT} RLUSD`);
+}
 
 async function main() {
   console.log('\n🌱  RLFactor seed starting (50 users / 50 NFTs / 50 listings)...\n');
 
   try {
+    await teardown();
     const users = await seedUsers();
+
+    // Read wallets file to get seeds for XRPL operations
+    const { readFileSync } = await import('fs');
+    const wallets = JSON.parse(readFileSync(
+      new URL('./seed-wallets.json', import.meta.url).pathname, 'utf8'
+    ));
+    await seedRLUSD(wallets);
+
     const result = await seedNFTsAndAuctions(users);
     if (result) {
       await seedBids(result);
