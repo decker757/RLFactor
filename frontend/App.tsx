@@ -43,7 +43,7 @@ export default function App() {
       if (existingUser) {
         // Existing user - go to dashboard
         setUsername(existingUser.username);
-        setUserRole(existingUser.role);
+        setUserRole(existingUser.role as UserRole);
         setIsAuthenticated(true);
         setCurrentPage('dashboard');
       } else {
