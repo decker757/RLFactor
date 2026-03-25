@@ -5,6 +5,7 @@ import { AuctionBid, NFToken } from '../../lib/supabase';
 import { toast } from 'sonner';
 import { fetchPaymentsToCollect, cashMaturityPaymentCheck, MaturityPayment } from '../../utils/maturityPayment';
 import { transferRLUSDToPlatform } from '../../lib/xrpl-nft';
+import { BACKEND_URL } from '../../lib/api';
 
 export function CustomerDashboard({ 
   username,
@@ -59,7 +60,7 @@ export function CustomerDashboard({
       setLoading(true);
       const [bids, won, history, tokens, payments] = await Promise.all([
         getBidsByUser(publicKey),
-        fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:6767'}/auctions/user/won`, {
+        fetch(`${BACKEND_URL}/auctions/user/won`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`
           }
@@ -70,7 +71,7 @@ export function CustomerDashboard({
           console.error('Error fetching won auctions:', err);
           return [];
         }),
-        fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:6767'}/auctions/user/bids/history`, {
+        fetch(`${BACKEND_URL}/auctions/user/bids/history`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`
           }
@@ -122,7 +123,7 @@ export function CustomerDashboard({
       const paymentTxHash = paymentResult.txHash!;
       toast.loading('Payment successful! Claiming NFT...', { id: 'pay-claim' });
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:6767'}/auctions/${wonAuction.AUCTIONLISTING.aid}/pay`, {
+      const response = await fetch(`${BACKEND_URL}/auctions/${wonAuction.AUCTIONLISTING.aid}/pay`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

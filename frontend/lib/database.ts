@@ -1,4 +1,5 @@
 import { supabase, User, NFToken, AuctionListing, AuctionBid, AuctionListingWithNFT, isSupabaseConfigured } from './supabase';
+import { BACKEND_URL } from './api';
 
 // Helper function to check if Supabase is configured
 function checkSupabaseConfig() {
@@ -215,7 +216,7 @@ export async function getAllAuctionListings() {
 
 export async function getActiveAuctionListings() {
   // Use backend API endpoint for consistency
-  const response = await fetch('http://localhost:6767/auctions', {
+  const response = await fetch(`${BACKEND_URL}/auctions`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
@@ -334,7 +335,7 @@ export async function getBidsByUser(_publicKey: string) {
     throw new Error('Authentication required');
   }
 
-  const response = await fetch('http://localhost:6767/auctions/user/bids', {
+  const response = await fetch(`${BACKEND_URL}/auctions/user/bids`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${authToken}`,

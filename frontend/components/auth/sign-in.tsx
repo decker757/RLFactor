@@ -4,7 +4,7 @@ import * as xrpl from 'xrpl';
 import { sign } from 'ripple-keypairs';
 import { toast } from 'sonner';
 
-const BACKEND_URL = 'http://localhost:6767';
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:6767';
 
 interface SignInProps {
   onSignIn: (address: string) => void;

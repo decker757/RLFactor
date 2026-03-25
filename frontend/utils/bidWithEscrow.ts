@@ -8,7 +8,7 @@
 
 import * as xrpl from 'xrpl';
 
-const BACKEND_URL = 'http://localhost:6767';
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:6767';
 const XRPL_NETWORK = 'wss://s.altnet.rippletest.net:51233';
 const RLUSD_ISSUER = import.meta.env.VITE_RLUSD_ISSUER || 'rQhWct2fv4Vc4KRjRgMrxa8xPN9Zx9iLKV';
 // RLUSD as hex-encoded currency code (non-standard 3-char codes must be 40-char hex)

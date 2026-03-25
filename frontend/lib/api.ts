@@ -1,4 +1,4 @@
-const BACKEND_URL = 'http://localhost:6767';
+export const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:6767';
 
 /**
  * Make an authenticated API request to the backend
