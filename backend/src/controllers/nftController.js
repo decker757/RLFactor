@@ -8,17 +8,80 @@ import { deriveAddress } from 'ripple-keypairs';
 import { connectXRPL } from '../config/xrplClient.js';
 
 /**
- * Complete flow: Mint NFT with image generation and metadata
+ * Background worker: runs the slow parts of minting (OpenAI + XRPL) after the
+ * HTTP response has already been sent.  Updates NFTOKEN in-place so that the
+ * frontend Supabase real-time subscription receives the state transition
+ * minting → issued (or failed).
+ */
+async function runMintingJob(tempNftId, { invoiceNumber, faceValue, maturityDate, creditorAddress, debtorAddress }) {
+  try {
+    // Step 3: Generate unique image using OpenAI DALL-E 2 (3-5s vs 10-30s for DALL-E 3)
+    console.log(`\n[BG] [Step 3] Generating image for ${tempNftId}...`);
+    const imageUrl = await generateUniqueInvoiceImage({ invoiceNumber, faceValue, maturityDate });
+    console.log(`[BG] ✓ Image generated`);
+
+    // Step 4: Download and upload image to Supabase Storage
+    console.log(`[BG] [Step 4] Uploading image...`);
+    const imageBuffer = await downloadImageAsBuffer(imageUrl);
+    const imageFileName = `${invoiceNumber}-${Date.now()}.png`;
+    const imageLink = await uploadImageToStorage(imageBuffer, imageFileName);
+    await supabase.from('NFTOKEN').update({ image_link: imageLink }).eq('nftoken_id', tempNftId);
+    console.log(`[BG] ✓ Image uploaded: ${imageLink}`);
+
+    // Step 5: Generate + upload metadata JSON
+    console.log(`[BG] [Step 5-6] Building and uploading metadata...`);
+    const metadata = generateMetadataJSON({
+      invoiceNumber, faceValue, maturityDate,
+      imageUrl: imageLink,
+      originalOwner: debtorAddress,
+      creditorPublicKey: creditorAddress,
+    });
+    validateMetadata(metadata);
+    const metadataFileName = `${invoiceNumber}-${Date.now()}.json`;
+    const metadataUri = await uploadMetadataToStorage(metadata, metadataFileName);
+    console.log(`[BG] ✓ Metadata uploaded: ${metadataUri}`);
+
+    // Step 7: Mint NFT on XRPL + create sell offer (two ledger confirmations, ~8s)
+    console.log(`[BG] [Step 7] Minting NFT on XRPL...`);
+    const mintResult = await mintAndTransferNFT({
+      metadataUri,
+      recipientAddress: creditorAddress,
+      issuerWallet: platformWallet,
+      transferFee: 0,
+    });
+    console.log(`[BG] ✓ NFT minted: ${mintResult.nftokenId}`);
+
+    // Step 8: Swap temp ID → real NFTokenID and mark as issued
+    const { error: updateError } = await supabase
+      .from('NFTOKEN')
+      .update({ nftoken_id: mintResult.nftokenId, current_state: 'issued' })
+      .eq('nftoken_id', tempNftId);
+
+    if (updateError) {
+      console.error(`[BG] Warning: failed to update NFTokenID in DB:`, updateError);
+    } else {
+      console.log(`[BG] ✓ NFTOKEN updated → ${mintResult.nftokenId} (state: issued)`);
+    }
+
+    console.log(`\n[BG] === Minting job complete for ${tempNftId} ===\n`);
+  } catch (err) {
+    console.error(`[BG] ❌ Minting job failed for ${tempNftId}:`, err.message);
+    await supabase
+      .from('NFTOKEN')
+      .update({ current_state: 'failed' })
+      .eq('nftoken_id', tempNftId);
+  }
+}
+
+/**
+ * POST /nft/mint
  *
- * Steps:
- * 1. Invoice created in app (from request body)
- * 2. Save invoice data to DB
- * 3. Generate unique image (OpenAI)
- * 4. Upload image → get image_link
- * 5. Generate metadata JSON
- * 6. Upload JSON → get metadata_uri
- * 7. Mint NFT on XRPL using metadata_uri
- * 8. Save NFTokenID back to DB
+ * Returns 202 immediately after creating the DB record (state: 'minting').
+ * Heavy work — OpenAI image generation, Supabase uploads, two XRPL ledger
+ * confirmations — runs in the background via runMintingJob().
+ *
+ * The frontend should subscribe to real-time changes on the NFTOKEN row and
+ * react when current_state transitions from 'minting' → 'issued' | 'failed'.
  */
 export async function mintInvoiceNFT(req, res) {
   try {
@@ -27,194 +90,68 @@ export async function mintInvoiceNFT(req, res) {
       faceValue,
       maturityDate,
       creditorPublicKey,
-      debtorPublicKey // The establishment creating the invoice (who owes money)
+      debtorPublicKey,
     } = req.body;
 
-    // Validation
     if (!invoiceNumber || !faceValue || !maturityDate || !creditorPublicKey || !debtorPublicKey) {
       return res.status(400).json({
         error: 'Missing required fields',
-        required: ['invoiceNumber', 'faceValue', 'maturityDate', 'creditorPublicKey', 'debtorPublicKey']
+        required: ['invoiceNumber', 'faceValue', 'maturityDate', 'creditorPublicKey', 'debtorPublicKey'],
       });
     }
 
-    console.log(`\n=== Starting NFT Minting Process ===`);
-    console.log(`Invoice: ${invoiceNumber}`);
-    console.log(`Face Value: $${faceValue}`);
-    console.log(`Maturity: ${maturityDate}`);
-    console.log(`Debtor: ${debtorPublicKey.slice(0, 10)}...`);
-    console.log(`Creditor: ${creditorPublicKey.slice(0, 10)}...`);
-
-    // Convert public keys to wallet addresses (if not already addresses)
-    // Addresses start with 'r', public keys are hex strings (64 or 66 chars)
+    // Derive XRPL addresses from public keys (or pass-through if already an address)
     let debtorAddress, creditorAddress;
-
     try {
       debtorAddress = debtorPublicKey.startsWith('r') ? debtorPublicKey : deriveAddress(debtorPublicKey);
-    } catch (error) {
-      console.error('Error deriving debtor address:', error);
-      return res.status(400).json({
-        error: 'Invalid debtor public key or address',
-        details: error.message
-      });
+    } catch (err) {
+      return res.status(400).json({ error: 'Invalid debtor public key or address', details: err.message });
     }
-
     try {
       creditorAddress = creditorPublicKey.startsWith('r') ? creditorPublicKey : deriveAddress(creditorPublicKey);
-    } catch (error) {
-      console.error('Error deriving creditor address:', error);
-      return res.status(400).json({
-        error: 'Invalid creditor public key or address',
-        details: error.message
-      });
+    } catch (err) {
+      return res.status(400).json({ error: 'Invalid creditor public key or address', details: err.message });
     }
 
-    console.log(`Debtor Address: ${debtorAddress}`);
-    console.log(`Creditor Address: ${creditorAddress}`);
-
-    // Step 1 & 2: Generate temporary NFT ID and save initial invoice data to DB
-    console.log('\n[Step 1-2] Creating invoice record in database...');
+    // Create DB record immediately with state 'minting'
     const tempNftId = `NFT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-    const { data: nftRecord, error: dbError } = await supabase
+    const { error: dbError } = await supabase
       .from('NFTOKEN')
       .insert([{
-        nftoken_id: tempNftId, // Temporary, will update with real NFTokenID later
-        created_by: debtorAddress, // ✅ Store ADDRESS not public key
+        nftoken_id: tempNftId,
+        created_by: debtorAddress,
         invoice_number: invoiceNumber,
         face_value: faceValue,
-        image_link: null, // Will update after image upload
+        image_link: null,
         maturity_date: maturityDate,
-        current_owner: creditorAddress, // ✅ Store ADDRESS not public key
-        current_state: 'minting' // Temporary state during minting process
-      }])
-      .select()
-      .single();
+        current_owner: creditorAddress,
+        current_state: 'minting',
+      }]);
 
     if (dbError) {
       throw new Error(`Database error: ${dbError.message}`);
     }
 
-    console.log('✓ Invoice record created with temp ID:', tempNftId);
+    // Kick off background job — do NOT await.
+    // The client gets a 202 immediately; the Supabase real-time subscription
+    // on the frontend will fire when current_state changes to 'issued' or 'failed'.
+    runMintingJob(tempNftId, { invoiceNumber, faceValue, maturityDate, creditorAddress, debtorAddress })
+      .catch(err => console.error('[BG] Unhandled minting job error:', err));
 
-    try {
-      // Step 3: Generate unique image using OpenAI
-      console.log('\n[Step 3] Generating unique image with OpenAI...');
-      const imageUrl = await generateUniqueInvoiceImage({
-        invoiceNumber,
-        faceValue,
-        maturityDate
-      });
-      console.log('✓ Image generated:', imageUrl);
+    console.log(`[mint] 202 returned for ${tempNftId} — background job started`);
 
-      // Step 4: Download and upload image to Supabase Storage
-      console.log('\n[Step 4] Uploading image to Supabase Storage...');
-      const imageBuffer = await downloadImageAsBuffer(imageUrl);
-      const imageFileName = `${invoiceNumber}-${Date.now()}.png`;
-      const imageLink = await uploadImageToStorage(imageBuffer, imageFileName);
-      console.log('✓ Image uploaded:', imageLink);
-
-      // Update database with image link
-      await supabase
-        .from('NFTOKEN')
-        .update({ image_link: imageLink })
-        .eq('nftoken_id', tempNftId);
-
-      // Step 5: Generate metadata JSON
-      console.log('\n[Step 5] Generating metadata JSON...');
-      const metadata = generateMetadataJSON({
-        invoiceNumber,
-        faceValue,
-        maturityDate,
-        imageUrl: imageLink,
-        originalOwner: debtorAddress, // ✅ Use address not public key
-        creditorPublicKey: creditorAddress // ✅ Use address not public key
-      });
-
-      validateMetadata(metadata);
-      console.log('✓ Metadata generated and validated');
-
-      // Step 6: Upload metadata JSON to storage
-      console.log('\n[Step 6] Uploading metadata to Supabase Storage...');
-      const metadataFileName = `${invoiceNumber}-${Date.now()}.json`;
-      const metadataUri = await uploadMetadataToStorage(metadata, metadataFileName);
-      console.log('✓ Metadata uploaded:', metadataUri);
-
-      // Step 7: Mint NFT on XRPL and create transfer offer
-      console.log('\n[Step 7] Minting NFT on XRPL...');
-      console.log('  Creditor Address:', creditorAddress);
-      console.log('  Platform Address:', platformWallet.address);
-
-      const mintResult = await mintAndTransferNFT({
-        metadataUri,
-        recipientAddress: creditorAddress, // Use derived address, not public key
-        issuerWallet: platformWallet,
-        transferFee: 0 // No transfer fee
-      });
-
-      console.log('✓ NFT minted successfully!');
-      console.log('  NFTokenID:', mintResult.nftokenId);
-      console.log('  Mint Tx:', mintResult.mintTxHash);
-      console.log('  Offer Tx:', mintResult.offerTxHash);
-
-      // Step 8: Update database with real NFTokenID
-      console.log('\n[Step 8] Updating database with NFTokenID...');
-      const { data: updatedNft, error: updateError } = await supabase
-        .from('NFTOKEN')
-        .update({
-          nftoken_id: mintResult.nftokenId, // Real NFTokenID from XRPL
-          current_state: 'issued' // NFT successfully issued
-        })
-        .eq('nftoken_id', tempNftId)
-        .select()
-        .single();
-
-      if (updateError) {
-        console.error('Warning: Failed to update NFTokenID in database:', updateError);
-        // Don't fail the whole process since NFT is already minted
-      } else {
-        console.log('✓ Database updated with NFTokenID');
-      }
-
-      console.log('\n=== NFT Minting Complete! ===\n');
-
-      // Return success response
-      return res.status(200).json({
-        success: true,
-        message: 'Invoice NFT minted and transferred successfully',
-        data: {
-          nftokenId: mintResult.nftokenId,
-          invoiceNumber,
-          faceValue,
-          maturityDate,
-          imageLink,
-          metadataUri,
-          issuer: mintResult.issuer,
-          recipient: mintResult.recipient,
-          mintTxHash: mintResult.mintTxHash,
-          offerIndex: mintResult.offerIndex,
-          offerTxHash: mintResult.offerTxHash
-        }
-      });
-
-    } catch (mintError) {
-      // If anything fails after DB insert, update state to 'failed'
-      await supabase
-        .from('NFTOKEN')
-        .update({ current_state: 'failed' })
-        .eq('nftoken_id', tempNftId);
-
-      throw mintError;
-    }
+    return res.status(202).json({
+      success: true,
+      message: 'Minting started. Subscribe to real-time updates for completion.',
+      data: { tempNftId, invoiceNumber, faceValue, maturityDate, status: 'minting' },
+    });
 
   } catch (error) {
     console.error('\n❌ NFT Minting Error:', error);
-
     return res.status(500).json({
       success: false,
-      error: 'Failed to mint NFT',
+      error: 'Failed to initiate NFT minting',
       message: error.message,
-      details: error.stack
     });
   }
 }

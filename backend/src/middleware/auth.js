@@ -27,3 +27,22 @@ export function authenticateToken(req, res, next) {
     next();
   });
 }
+
+// Role-based access control middleware
+// Usage: requireRole('admin') or requireRole('admin', 'business')
+export function requireRole(...roles) {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+    if (!roles.includes(req.user.role)) {
+      console.log(`🚫 RBAC Denied: user role '${req.user.role}' not in [${roles.join(', ')}]`);
+      return res.status(403).json({
+        error: "Insufficient permissions",
+        required: roles,
+        actual: req.user.role,
+      });
+    }
+    next();
+  };
+}

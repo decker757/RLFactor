@@ -33,13 +33,13 @@ Modern, elegant, minimalist design with ${getAccentColor(invoiceData.invoiceNumb
 
     console.log('Generating image with prompt:', basePrompt);
 
+    // DALL-E 2 at 512×512 generates in ~3-5s vs 10-30s for DALL-E 3 at 1024×1024.
+    // For invoice NFT artwork the visual difference is negligible.
     const response = await openai.images.generate({
-      model: "dall-e-3",
+      model: "dall-e-2",
       prompt: basePrompt,
       n: 1,
-      size: "1024x1024",
-      quality: "standard",
-      style: "vivid"
+      size: "512x512",
     });
 
     if (!response.data || response.data.length === 0) {

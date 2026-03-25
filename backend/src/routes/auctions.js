@@ -12,7 +12,7 @@ import {
   finalizeAuctionManually,
   processAllExpiredAuctions
 } from '../controllers/auctionController.js';
-import { authenticateToken } from '../middleware/auth.js';
+import { authenticateToken, requireRole } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -31,9 +31,8 @@ router.get('/auctions/:id/bids', getAuctionBids);
 router.post('/auctions/:id/bids', authenticateToken, placeBid);
 router.post('/auctions/:id/pay', authenticateToken, payAndClaimNFT);
 
-// Admin/testing routes for manual finalization
-// In production, these should have additional admin authentication
-router.post('/auctions/:id/finalize', authenticateToken, finalizeAuctionManually);
-router.post('/auctions/process-expired', authenticateToken, processAllExpiredAuctions);
+// Admin-only routes — require 'admin' role (RBAC enforced)
+router.post('/auctions/:id/finalize', authenticateToken, requireRole('admin'), finalizeAuctionManually);
+router.post('/auctions/process-expired', authenticateToken, requireRole('admin'), processAllExpiredAuctions);
 
 export default router;

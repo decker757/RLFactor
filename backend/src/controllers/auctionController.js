@@ -306,42 +306,11 @@ export const placeBid = async (req, res) => {
 
     // Validate required fields
     if (!bid_amount || bid_amount <= 0) {
-      return res.status(400).json({
-        error: 'Invalid bid amount'
-      });
+      return res.status(400).json({ error: 'Invalid bid amount' });
     }
 
-    // Get auction details
-    const { data: auction, error: auctionError } = await supabase
-      .from('AUCTIONLISTING')
-      .select('*')
-      .eq('aid', id)
-      .single();
-
-    if (auctionError || !auction) {
-      return res.status(404).json({ error: 'Auction not found' });
-    }
-
-    // Check if auction has expired
-    const now = new Date();
-    const expiryDate = new Date(auction.expiry);
-    if (expiryDate <= now) {
-      return res.status(400).json({
-        error: 'Auction has expired'
-      });
-    }
-
-    // Validate bid meets minimum requirements
-    if (bid_amount < auction.min_bid) {
-      return res.status(400).json({
-        error: `Bid must be at least ${auction.min_bid} RLUSD`,
-        min_bid: auction.min_bid
-      });
-    }
-
-    // Verify bidder has sufficient RLUSD balance
+    // Verify bidder has sufficient RLUSD balance before acquiring the DB lock
     const hasSufficientBalance = await hasEnoughRLUSD(address, bid_amount);
-
     if (!hasSufficientBalance) {
       return res.status(400).json({
         error: 'Insufficient RLUSD balance to place this bid',
@@ -350,96 +319,32 @@ export const placeBid = async (req, res) => {
       });
     }
 
-    // Check if user already has a bid on this auction
-    const { data: existingBid } = await supabase
-      .from('AUCTIONBIDS')
-      .select('bid_id')
-      .eq('aid', id)
-      .eq('bid_by', address)
-      .eq('check_status', 'active')
-      .single();
+    // Atomically place or update the bid using a PostgreSQL stored procedure.
+    // place_bid_atomic acquires a SELECT FOR UPDATE row-lock on the auction,
+    // preventing duplicate bids and race conditions under concurrent requests.
+    const { data: result, error: rpcError } = await supabase.rpc('place_bid_atomic', {
+      p_auction_id: parseInt(id, 10),
+      p_bidder:     address,
+      p_bid_amount: bid_amount,
+    });
 
-    let bidData;
-
-    if (existingBid) {
-      // Update existing bid
-      console.log(`Updating existing bid ${existingBid.bid_id} for auction ${id}`);
-      const { data, error: bidError } = await supabase
-        .from('AUCTIONBIDS')
-        .update({
-          bid_amount,
-          created_at: new Date().toISOString() // Update timestamp to reflect new bid time
-        })
-        .eq('bid_id', existingBid.bid_id)
-        .select()
-        .single();
-
-      if (bidError) {
-        console.error('Error updating bid:', bidError);
-        return res.status(500).json({ error: bidError.message });
-      }
-      bidData = data;
-    } else {
-      // Create new bid (no payment required at this stage)
-      console.log(`Creating new bid for auction ${id}`);
-      const { data, error: bidError } = await supabase
-        .from('AUCTIONBIDS')
-        .insert({
-          aid: id,
-          bid_amount,
-          bid_by: address,
-          check_status: 'active' // Bid is active; payment happens after winning
-        })
-        .select()
-        .single();
-
-      if (bidError) {
-        console.error('Error placing bid:', bidError);
-        return res.status(500).json({ error: bidError.message });
-      }
-      bidData = data;
+    if (rpcError) {
+      console.error('Error in place_bid_atomic RPC:', rpcError);
+      return res.status(500).json({ error: rpcError.message });
     }
 
-    // Recalculate current_bid by finding highest active bid
-    const { data: allBids, error: bidsError } = await supabase
-      .from('AUCTIONBIDS')
-      .select('bid_amount')
-      .eq('aid', id)
-      .eq('check_status', 'active')
-      .order('bid_amount', { ascending: false });
-
-    if (bidsError) {
-      console.error('Error fetching bids for recalculation:', bidsError);
+    if (!result.ok) {
+      const status = result.error === 'Auction not found' ? 404 : 400;
+      return res.status(status).json({ error: result.error, min_bid: result.min_bid });
     }
 
-    // Get the highest bid amount from active bids
-    const newCurrentBid = (allBids && allBids.length > 0)
-      ? allBids[0].bid_amount
-      : auction.min_bid;
-
-    console.log(`Recalculated current_bid for auction ${id}: ${newCurrentBid} (from ${allBids?.length || 0} active bids)`);
-
-    // Update current_bid in auction listing
-    const { error: updateError } = await supabase
-      .from('AUCTIONLISTING')
-      .update({ current_bid: newCurrentBid })
-      .eq('aid', id);
-
-    if (updateError) {
-      console.error('Error updating auction:', updateError);
-      // Rollback: delete the bid we just created
-      await supabase.from('AUCTIONBIDS').delete().eq('bid_id', bidData.bid_id);
-      return res.status(500).json({ error: 'Failed to update auction' });
-    }
-
-    // Bid placed successfully - no payment required yet
-    // Winner will pay after auction expires via "Pay & Claim NFT" button
+    console.log(`Bid placed atomically — new top bid: ${result.current_bid} RLUSD`);
 
     res.status(201).json({
       success: true,
       message: 'Bid placed successfully. If you win, you will be able to pay and claim the NFT.',
-      bid: bidData,
-      new_current_bid: newCurrentBid
+      bid: result.bid,
+      new_current_bid: result.current_bid,
     });
   } catch (error) {
     console.error('Error in placeBid:', error);
