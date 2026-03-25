@@ -19,7 +19,7 @@ export interface MaturityPayment {
   maturity_date: string;
   xrpl_check_id?: string;
   xrpl_check_tx_hash?: string;
-  check_status: 'pending' | 'created' | 'cashed' | 'overdue';
+  check_status: 'pending' | 'created' | 'cashed' | 'overdue' | 'completed';
   notified_at?: string;
   check_created_at?: string;
   paid_at?: string;
