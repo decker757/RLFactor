@@ -5,14 +5,28 @@ const PLATFORM_WALLET_ADDRESS = 'rJoESWx9ZKHpEyNrLWBTA95XLxwoKJj59u';
 const RLUSD_ISSUER = 'r9EMUwedCZFW53NVfw9SNHvKoRWJ8fbgu7';
 const RLUSD_CURRENCY = '524C555344000000000000000000000000000000'; // "RLUSD" in hex
 
+// Module-level singleton — one WebSocket connection shared across all operations.
+// Previously every function created + connected + disconnected its own client,
+// adding ~1-2s of handshake overhead per call.
+let _client: xrpl.Client | null = null;
+
+async function getClient(): Promise<xrpl.Client> {
+  if (!_client) {
+    _client = new xrpl.Client(XRPL_NETWORK);
+  }
+  if (!_client.isConnected()) {
+    await _client.connect();
+  }
+  return _client;
+}
+
 /**
  * Find sell offers for a specific NFT
  */
 export async function findNFTSellOffers(nftokenId: string): Promise<any[]> {
-  const client = new xrpl.Client(XRPL_NETWORK);
+  const client = await getClient();
 
   try {
-    await client.connect();
     console.log('📡 Requesting sell offers for NFT:', nftokenId);
 
     const response = await client.request({
@@ -38,8 +52,6 @@ export async function findNFTSellOffers(nftokenId: string): Promise<any[]> {
     }
 
     throw new Error(error?.data?.error_message || error?.message || 'Failed to find NFT sell offers');
-  } finally {
-    await client.disconnect();
   }
 }
 
@@ -56,12 +68,9 @@ export async function acceptNFTOffer(params: {
   txHash?: string;
   error?: string;
 }> {
-  const client = new xrpl.Client(XRPL_NETWORK);
+  const client = await getClient();
 
   try {
-    await client.connect();
-    console.log('🔗 Connected to XRPL');
-
     // Create wallet from seed
     const wallet = xrpl.Wallet.fromSeed(params.walletSeed);
     console.log('👛 Wallet address:', wallet.address);
@@ -102,8 +111,6 @@ export async function acceptNFTOffer(params: {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error occurred',
     };
-  } finally {
-    await client.disconnect();
   }
 }
 
@@ -111,11 +118,9 @@ export async function acceptNFTOffer(params: {
  * Get NFT ownership information
  */
 export async function getNFTOwner(nftokenId: string, ownerAddress: string): Promise<boolean> {
-  const client = new xrpl.Client(XRPL_NETWORK);
+  const client = await getClient();
 
   try {
-    await client.connect();
-
     const response = await client.request({
       command: 'account_nfts',
       account: ownerAddress,
@@ -127,8 +132,6 @@ export async function getNFTOwner(nftokenId: string, ownerAddress: string): Prom
   } catch (error) {
     console.error('Error checking NFT ownership:', error);
     return false;
-  } finally {
-    await client.disconnect();
   }
 }
 
@@ -146,12 +149,9 @@ export async function createSellOfferToPlatform(params: {
   txHash?: string;
   error?: string;
 }> {
-  const client = new xrpl.Client(XRPL_NETWORK);
+  const client = await getClient();
 
   try {
-    await client.connect();
-    console.log('🔗 Connected to XRPL');
-
     // Create wallet from seed
     const wallet = xrpl.Wallet.fromSeed(params.walletSeed);
     console.log('👛 Wallet address:', wallet.address);
@@ -214,8 +214,6 @@ export async function createSellOfferToPlatform(params: {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error occurred',
     };
-  } finally {
-    await client.disconnect();
   }
 }
 
@@ -231,12 +229,9 @@ export async function transferRLUSDToPlatform(params: {
   txHash?: string;
   error?: string;
 }> {
-  const client = new xrpl.Client(XRPL_NETWORK);
+  const client = await getClient();
 
   try {
-    await client.connect();
-    console.log('🔗 Connected to XRPL');
-
     // Create wallet from seed
     const wallet = xrpl.Wallet.fromSeed(params.walletSeed);
     console.log('👛 Wallet address:', wallet.address);
@@ -288,8 +283,6 @@ export async function transferRLUSDToPlatform(params: {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error occurred',
     };
-  } finally {
-    await client.disconnect();
   }
 }
 
@@ -311,12 +304,9 @@ export async function createNFTRedemptionOffer(params: {
   txHash?: string;
   error?: string;
 }> {
-  const client = new xrpl.Client(XRPL_NETWORK);
+  const client = await getClient();
 
   try {
-    await client.connect();
-    console.log('🔗 Connected to XRPL');
-
     const wallet = xrpl.Wallet.fromSeed(params.walletSeed);
     const destination = params.destination || PLATFORM_WALLET_ADDRESS;
 
@@ -378,7 +368,6 @@ export async function createNFTRedemptionOffer(params: {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error occurred'
     };
-  } finally {
-    await client.disconnect();
+
   }
 }

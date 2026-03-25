@@ -59,19 +59,19 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-8 text-center">
+              <div className="bg-linear-to-br from-blue-600 to-purple-600 rounded-2xl p-8 text-center">
                 <div className="text-4xl font-bold text-white mb-2">$50M+</div>
                 <div className="text-blue-100 text-sm">Total Volume</div>
               </div>
-              <div className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl p-8 text-center">
+              <div className="bg-linear-to-br from-purple-600 to-pink-600 rounded-2xl p-8 text-center">
                 <div className="text-4xl font-bold text-white mb-2">500+</div>
                 <div className="text-purple-100 text-sm">Businesses</div>
               </div>
-              <div className="bg-gradient-to-br from-pink-600 to-orange-600 rounded-2xl p-8 text-center">
+              <div className="bg-linear-to-br from-pink-600 to-orange-600 rounded-2xl p-8 text-center">
                 <div className="text-4xl font-bold text-white mb-2">1,200+</div>
                 <div className="text-pink-100 text-sm">Investors</div>
               </div>
-              <div className="bg-gradient-to-br from-orange-600 to-red-600 rounded-2xl p-8 text-center">
+              <div className="bg-linear-to-br from-orange-600 to-red-600 rounded-2xl p-8 text-center">
                 <div className="text-4xl font-bold text-white mb-2">98%</div>
                 <div className="text-orange-100 text-sm">Success Rate</div>
               </div>
@@ -92,7 +92,7 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 hover:border-blue-600/50 transition-all">
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center mb-4">
+              <div className="w-14 h-14 bg-linear-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center mb-4">
                 <Shield className="w-7 h-7 text-white" />
               </div>
               <h3 className="text-xl text-white mb-3">Security First</h3>
@@ -102,7 +102,7 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
             </div>
 
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 hover:border-purple-600/50 transition-all">
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center mb-4">
+              <div className="w-14 h-14 bg-linear-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center mb-4">
                 <Eye className="w-7 h-7 text-white" />
               </div>
               <h3 className="text-xl text-white mb-3">Transparency</h3>
@@ -112,7 +112,7 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
             </div>
 
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 hover:border-pink-600/50 transition-all">
-              <div className="w-14 h-14 bg-gradient-to-br from-pink-600 to-orange-600 rounded-xl flex items-center justify-center mb-4">
+              <div className="w-14 h-14 bg-linear-to-br from-pink-600 to-orange-600 rounded-xl flex items-center justify-center mb-4">
                 <Zap className="w-7 h-7 text-white" />
               </div>
               <h3 className="text-xl text-white mb-3">Speed</h3>
@@ -122,7 +122,7 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
             </div>
 
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 hover:border-orange-600/50 transition-all">
-              <div className="w-14 h-14 bg-gradient-to-br from-orange-600 to-red-600 rounded-xl flex items-center justify-center mb-4">
+              <div className="w-14 h-14 bg-linear-to-br from-orange-600 to-red-600 rounded-xl flex items-center justify-center mb-4">
                 <Lightbulb className="w-7 h-7 text-white" />
               </div>
               <h3 className="text-xl text-white mb-3">Innovation</h3>
@@ -132,7 +132,7 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
             </div>
 
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 hover:border-cyan-600/50 transition-all">
-              <div className="w-14 h-14 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-xl flex items-center justify-center mb-4">
+              <div className="w-14 h-14 bg-linear-to-br from-cyan-600 to-blue-600 rounded-xl flex items-center justify-center mb-4">
                 <Globe className="w-7 h-7 text-white" />
               </div>
               <h3 className="text-xl text-white mb-3">Accessibility</h3>
@@ -142,7 +142,7 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
             </div>
 
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 hover:border-indigo-600/50 transition-all">
-              <div className="w-14 h-14 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center mb-4">
+              <div className="w-14 h-14 bg-linear-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center mb-4">
                 <Users className="w-7 h-7 text-white" />
               </div>
               <h3 className="text-xl text-white mb-3">Community</h3>
@@ -157,7 +157,7 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
       {/* Why XRPL Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-3xl p-8 lg:p-12 relative overflow-hidden">
+          <div className="bg-linear-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-3xl p-8 lg:p-12 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl"></div>
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl"></div>
 
@@ -171,7 +171,7 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
 
               <div className="grid md:grid-cols-3 gap-8">
                 <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-400 rounded-xl flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 bg-linear-to-br from-blue-600 to-blue-400 rounded-xl flex items-center justify-center mb-4">
                     <Zap className="w-6 h-6 text-white" />
                   </div>
                   <h3 className="text-xl text-white mb-3">Lightning Fast</h3>
@@ -181,7 +181,7 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
                 </div>
 
                 <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-purple-400 rounded-xl flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 bg-linear-to-br from-purple-600 to-purple-400 rounded-xl flex items-center justify-center mb-4">
                     <TrendingUp className="w-6 h-6 text-white" />
                   </div>
                   <h3 className="text-xl text-white mb-3">Low Costs</h3>
@@ -191,7 +191,7 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
                 </div>
 
                 <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-pink-600 to-pink-400 rounded-xl flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 bg-linear-to-br from-pink-600 to-pink-400 rounded-xl flex items-center justify-center mb-4">
                     <Award className="w-6 h-6 text-white" />
                   </div>
                   <h3 className="text-xl text-white mb-3">Native NFTs</h3>
@@ -239,7 +239,7 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
               },
             ].map((member, index) => (
               <div key={index} className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-700 transition-all group">
-                <div className={`h-48 bg-gradient-to-br ${member.bg} relative`}>
+                <div className={`h-48 bg-linear-to-br ${member.bg} relative`}>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-24 h-24 rounded-full bg-white/10 backdrop-blur-sm border-4 border-white/20"></div>
                   </div>
@@ -266,7 +266,7 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-yellow-600 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-linear-to-br from-yellow-600 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg text-white mb-2">Best DeFi Innovation 2024</h3>
@@ -274,7 +274,7 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-linear-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg text-white mb-2">Top 10 FinTech Startups</h3>
@@ -282,7 +282,7 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-linear-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg text-white mb-2">XRPL Grant Recipient</h3>
@@ -304,7 +304,7 @@ export function About({ setCurrentPage }: { setCurrentPage: (page: Page) => void
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => setCurrentPage('sign-in')}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all text-lg"
+              className="px-8 py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all text-lg"
             >
               Get Started
             </button>

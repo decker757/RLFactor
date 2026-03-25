@@ -83,7 +83,7 @@ export function WonAuctionsSection({ publicKey }: { publicKey: string }) {
             <div key={auction.id} className="p-6 bg-gray-800/50 border border-yellow-600/50 rounded-lg hover:border-yellow-600 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-600 to-orange-600 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-linear-to-br from-yellow-600 to-orange-600 rounded-lg flex items-center justify-center">
                     <CheckCircle className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -120,7 +120,7 @@ export function WonAuctionsSection({ publicKey }: { publicKey: string }) {
                 <span className="text-xs text-gray-500">Complete payment to receive NFT ownership</span>
                 <button 
                   onClick={() => handleCompletePayment(auction)}
-                  className="px-6 py-2 bg-gradient-to-r from-yellow-600 to-orange-600 text-white rounded-lg hover:from-yellow-700 hover:to-orange-700 transition-colors text-sm font-medium flex items-center gap-2">
+                  className="px-6 py-2 bg-linear-to-r from-yellow-600 to-orange-600 text-white rounded-lg hover:from-yellow-700 hover:to-orange-700 transition-colors text-sm font-medium flex items-center gap-2">
                   <CreditCard className="w-4 h-4" />
                   Complete Payment
                 </button>
@@ -143,7 +143,7 @@ export function WonAuctionsSection({ publicKey }: { publicKey: string }) {
             {!isProcessing ? (
               <>
                 <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-yellow-600 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-linear-to-br from-yellow-600 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <CreditCard className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-2xl text-white mb-2">Complete Payment</h3>
@@ -204,7 +204,7 @@ export function WonAuctionsSection({ publicKey }: { publicKey: string }) {
                   </button>
                   <button
                     onClick={handleConfirmPayment}
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white rounded-xl transition-all font-medium">
+                    className="flex-1 px-6 py-3 bg-linear-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white rounded-xl transition-all font-medium">
                     Pay & Receive NFT
                   </button>
                 </div>

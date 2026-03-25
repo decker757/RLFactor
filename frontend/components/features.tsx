@@ -39,8 +39,8 @@ export function Features() {
       {/* Radial gradient background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-gradient-radial from-indigo-600/10 via-transparent to-transparent rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-gradient-to-tr from-blue-600/10 to-transparent rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-gradient-to-tl from-purple-600/10 to-transparent rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-linear-to-tr from-blue-600/10 to-transparent rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-linear-to-tl from-purple-600/10 to-transparent rounded-full blur-3xl"></div>
       </div>
       
       <div className="max-w-7xl mx-auto relative z-10">
@@ -57,7 +57,7 @@ export function Features() {
               key={index}
               className="p-8 bg-gray-900 rounded-xl border border-gray-800 hover:border-blue-800 hover:shadow-lg hover:shadow-blue-900/20 transition-all duration-300"
             >
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-900/50 to-purple-900/50 flex items-center justify-center mb-4 border border-blue-800/50">
+              <div className="w-12 h-12 rounded-lg bg-linear-to-br from-blue-900/50 to-purple-900/50 flex items-center justify-center mb-4 border border-blue-800/50">
                 <feature.icon className="w-6 h-6 text-blue-400" />
               </div>
               <h3 className="text-xl mb-3 text-white">{feature.title}</h3>

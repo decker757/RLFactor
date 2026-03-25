@@ -4,7 +4,7 @@ import { IssueTokenModal } from './issue-token-modal';
 import { ListTokenModal } from './list-token-modal';
 import { EstablishmentSettingsModal } from './establishment-settings-modal';
 import { AcceptNFTModal } from './accept-nft-modal';
-import { getNFTokensByCreator, getNFTokensByOwner, getAuctionListingsByOwner, getBidsByAuction } from '../../lib/database';
+import { getNFTokensByCreator, getNFTokensByOwner, getAuctionListingsByOwner, getBidsByAuction, subscribeToNFTokens } from '../../lib/database';
 import { NFToken, AuctionListingWithNFT } from '../../lib/supabase';
 import { mintInvoiceNFT, authenticatedFetch } from '../../lib/api';
 import { findNFTSellOffers, acceptNFTOffer, createSellOfferToPlatform, getNFTOwner } from '../../lib/xrpl-nft';
@@ -170,35 +170,39 @@ export function EstablishmentDashboard({
     buyerPublicKey: string;
   }) => {
     try {
-      // Show loading toast
-      const loadingToast = toast.loading('Minting NFT... This may take a moment.');
-
-      // Call backend to mint NFT with full flow:
-      // 1. Save to DB, 2. Generate image (OpenAI), 3. Upload image,
-      // 4. Generate metadata, 5. Upload metadata, 6. Mint on XRPL,
-      // 7. Transfer to creditor, 8. Update DB with NFTokenID
+      // Backend now returns 202 immediately after creating the DB record.
+      // Heavy work (OpenAI + XRPL) runs in the background.
       const result = await mintInvoiceNFT({
         invoiceNumber: token.invoiceNumber,
         faceValue: token.amount,
         maturityDate: token.maturityDate,
         creditorPublicKey: token.buyerPublicKey,
-        debtorPublicKey: publicKey // Current user (debtor)
+        debtorPublicKey: publicKey,
       });
 
-      // Dismiss loading toast
-      toast.dismiss(loadingToast);
-
-      if (result.success && result.data) {
-        toast.success(`Invoice NFT minted successfully! NFTokenID: ${result.data.nftokenId.slice(0, 16)}...`);
-        console.log('NFT Minting Result:', result.data);
-
-        setShowIssueModal(false);
-
-        // Reload data to show the new token
-        await loadIssuedTokens();
-      } else {
-        throw new Error(result.message || 'Failed to mint NFT');
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to initiate NFT minting');
       }
+
+      setShowIssueModal(false);
+      const mintingToast = toast.loading('Minting in progress — image generation and XRPL confirmation usually take 15-20 seconds.');
+
+      // Subscribe to real-time NFTOKEN updates.
+      // When the background job finishes, current_state changes from
+      // 'minting' → 'issued' (or 'failed') and this callback fires.
+      const subscription = subscribeToNFTokens((payload: any) => {
+        const updated = payload.new;
+        if (updated?.current_state === 'issued') {
+          toast.dismiss(mintingToast);
+          toast.success(`NFT minted! Token ID: ${updated.nftoken_id.slice(0, 16)}...`);
+          loadIssuedTokens();
+          subscription.unsubscribe();
+        } else if (updated?.current_state === 'failed') {
+          toast.dismiss(mintingToast);
+          toast.error('NFT minting failed — please try again.');
+          subscription.unsubscribe();
+        }
+      });
     } catch (error) {
       console.error('Failed to issue token:', error);
       toast.error(`Failed to mint NFT: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -446,7 +450,7 @@ export function EstablishmentDashboard({
         <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl lg:text-4xl mb-2 text-white">
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{establishmentInfo.name}</span>
+              <span className="bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{establishmentInfo.name}</span>
             </h1>
             <p className="text-gray-400">Manage your invoice tokens and auctions</p>
           </div>
@@ -460,7 +464,7 @@ export function EstablishmentDashboard({
             </button>
             <button
               onClick={() => setShowIssueModal(true)}
-              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
+              className="px-4 py-2 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               Issue Token
@@ -559,7 +563,7 @@ export function EstablishmentDashboard({
               <p className="text-gray-400 mb-4">No tokens issued yet</p>
               <button
                 onClick={() => setShowIssueModal(true)}
-                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                className="px-6 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:opacity-90 transition-opacity"
               >
                 Issue Your First Token
               </button>
@@ -670,7 +674,7 @@ export function EstablishmentDashboard({
                         </div>
                         <button
                           onClick={() => handleOpenAcceptModal(token)}
-                          className="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
+                          className="px-4 py-2 bg-linear-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
                         >
                           Accept NFT Ownership
                         </button>
@@ -681,7 +685,7 @@ export function EstablishmentDashboard({
                       <div className="pt-4 border-t border-gray-700">
                         <button
                           onClick={() => handleOpenListModal(token)}
-                          className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
+                          className="px-4 py-2 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
                         >
                           List on Auction
                         </button>
@@ -866,7 +870,7 @@ export function EstablishmentDashboard({
 
                     {isOverdue && (
                       <div className="mb-4 p-3 bg-red-950/30 border border-red-900/50 rounded-lg flex items-start gap-2">
-                        <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                        <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
                         <div className="text-sm text-red-400">
                           <strong>Overdue Payment:</strong> This payment is {daysOverdue} days past due. Please send the payment as soon as possible.
                         </div>
@@ -877,7 +881,7 @@ export function EstablishmentDashboard({
                       <button
                         onClick={() => handlePayMaturity(payment)}
                         disabled={payingMaturityFor === payment.payment_id}
-                        className="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="w-full px-6 py-3 bg-linear-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
                         {payingMaturityFor === payment.payment_id ? (
                           <>Processing Payment...</>

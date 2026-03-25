@@ -4,14 +4,14 @@ export function Footer() {
   return (
     <footer id="about" className="bg-gray-900 text-gray-300 py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Subtle gradient at top */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
-      <div className="absolute bottom-0 left-1/3 w-[500px] h-[500px] bg-gradient-to-t from-blue-600/5 to-transparent rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-blue-500/50 to-transparent"></div>
+      <div className="absolute bottom-0 left-1/3 w-[500px] h-[500px] bg-linear-to-t from-blue-600/5 to-transparent rounded-full blur-3xl pointer-events-none"></div>
       
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-linear-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Layers className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl text-white">RLFactor</span>

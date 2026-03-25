@@ -159,7 +159,7 @@ export default function App() {
       {!isSupabaseConfigured && (
         <div className="fixed bottom-4 right-4 left-4 md:left-auto md:w-96 bg-amber-900/90 backdrop-blur-sm border border-amber-700 text-white p-4 rounded-lg shadow-xl z-50">
           <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-amber-300 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-amber-300 shrink-0 mt-0.5" />
             <div>
               <h3 className="font-semibold text-amber-100 mb-1">Supabase Not Configured</h3>
               <p className="text-sm text-amber-200 mb-2">

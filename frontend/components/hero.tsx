@@ -7,8 +7,8 @@ export function Hero({ setCurrentPage }: { setCurrentPage: (page: Page) => void 
   return (
     <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative">
       {/* Section-specific gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-950/30 via-transparent to-transparent pointer-events-none"></div>
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-purple-600/10 via-transparent to-transparent rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute inset-0 bg-linear-to-b from-blue-950/30 via-transparent to-transparent pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-linear-to-bl from-purple-600/10 via-transparent to-transparent rounded-full blur-3xl pointer-events-none"></div>
       
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -35,7 +35,7 @@ export function Hero({ setCurrentPage }: { setCurrentPage: (page: Page) => void 
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <button
                 onClick={() => setCurrentPage('sign-in')}
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                className="px-8 py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
               >
                 Start Auction
                 <ArrowRight className="w-5 h-5" />
@@ -104,15 +104,15 @@ export function Hero({ setCurrentPage }: { setCurrentPage: (page: Page) => void 
                   </div>
                 </div>
 
-                <div className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg text-center opacity-75 cursor-not-allowed">
+                <div className="w-full py-3 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-lg text-center opacity-75 cursor-not-allowed">
                   Place Bid
                 </div>
               </div>
             </div>
 
             {/* Decorative elements */}
-            <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full blur-3xl opacity-20"></div>
-            <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full blur-3xl opacity-20"></div>
+            <div className="absolute -top-4 -right-4 w-24 h-24 bg-linear-to-br from-blue-600 to-purple-600 rounded-full blur-3xl opacity-20"></div>
+            <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-linear-to-br from-purple-600 to-pink-600 rounded-full blur-3xl opacity-20"></div>
           </div>
         </div>
       </div>

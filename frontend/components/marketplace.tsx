@@ -258,7 +258,7 @@ export function Marketplace({ userPublicKey, userRole }: { userPublicKey: string
                     onClick={() => setSelectedAuction(auction)}
                   >
                     {/* NFT Visual */}
-                    <div className={`relative h-64 ${!auction.NFTOKEN?.image_link ? 'bg-gradient-to-br from-blue-600 to-purple-600' : 'bg-gray-800'} flex items-center justify-center overflow-hidden`}>
+                    <div className={`relative h-64 ${!auction.NFTOKEN?.image_link ? 'bg-linear-to-br from-blue-600 to-purple-600' : 'bg-gray-800'} flex items-center justify-center overflow-hidden`}>
                       {auction.NFTOKEN?.image_link ? (
                         <img
                           src={auction.NFTOKEN.image_link}
@@ -323,7 +323,7 @@ export function Marketplace({ userPublicKey, userRole }: { userPublicKey: string
                           <span>{bidCounts[auction.aid] || 0} bids</span>
                         </div>
                         <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm group-hover:bg-blue-500">
-                          {userRole === 'establishment' ? 'View Details' : 'Place Bid'}
+                          {userRole === 'business' ? 'View Details' : 'Place Bid'}
                         </button>
                       </div>
                     </div>
@@ -416,7 +416,7 @@ function AuctionDetailModal({
 
         <div className="p-6">
           {/* NFT Visual */}
-          <div className={`relative h-64 ${!auction.NFTOKEN?.image_link ? 'bg-gradient-to-br from-blue-600 to-purple-600' : 'bg-gray-800'} rounded-xl flex items-center justify-center mb-6 overflow-hidden`}>
+          <div className={`relative h-64 ${!auction.NFTOKEN?.image_link ? 'bg-linear-to-br from-blue-600 to-purple-600' : 'bg-gray-800'} rounded-xl flex items-center justify-center mb-6 overflow-hidden`}>
             {auction.NFTOKEN?.image_link ? (
               <img
                 src={auction.NFTOKEN.image_link}
@@ -518,7 +518,7 @@ function AuctionDetailModal({
 
               <button
                 type="submit"
-                className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                className="w-full px-4 py-3 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity"
               >
                 Place Bid
               </button>
@@ -526,7 +526,7 @@ function AuctionDetailModal({
           )}
 
           {/* View-only message for establishments */}
-          {userRole === 'establishment' && (
+          {userRole === 'business' && (
             <div className="bg-amber-950/30 border border-amber-900/50 rounded-lg p-6">
               <div className="flex items-center gap-2 text-amber-400 mb-2">
                 <AlertCircle className="w-5 h-5" />
@@ -591,7 +591,7 @@ function BidConfirmationModal({
 
           <div className="bg-amber-950/30 border border-amber-900/50 rounded-lg p-4 mb-6">
             <div className="flex items-start gap-2">
-              <AlertCircle className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" />
+              <AlertCircle className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" />
               <div>
                 <p className="text-amber-400 text-sm font-medium mb-1">XRPL Check</p>
                 <p className="text-gray-400 text-xs">
@@ -617,7 +617,7 @@ function BidConfirmationModal({
             <button
               onClick={onConfirm}
               disabled={isPlacingBid}
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-3 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isPlacingBid ? (
                 <>

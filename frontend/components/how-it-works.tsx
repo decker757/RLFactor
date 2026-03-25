@@ -41,10 +41,10 @@ export function HowItWorks({ setCurrentPage }: { setCurrentPage: (page: Page) =>
             {/* Step 1 */}
             <div>
               <div className="relative bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-600/50 transition-all h-full flex flex-col">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-linear-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center mb-4">
                   <FileText className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl text-white mb-3 flex-shrink-0">Receive Invoice</h3>
+                <h3 className="text-xl text-white mb-3 shrink-0">Receive Invoice</h3>
                 <p className="text-gray-400 text-sm flex-grow">
                   A debtor acknowledges their obligation to you, with payment due at maturity
                 </p>
@@ -58,10 +58,10 @@ export function HowItWorks({ setCurrentPage }: { setCurrentPage: (page: Page) =>
             {/* Step 2 */}
             <div>
               <div className="relative bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-600/50 transition-all h-full flex flex-col">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-linear-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center mb-4">
                   <Coins className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl text-white mb-3 flex-shrink-0">Mint NFT</h3>
+                <h3 className="text-xl text-white mb-3 shrink-0">Mint NFT</h3>
                 <p className="text-gray-400 text-sm flex-grow">
                   You mint the invoice as an NFT on XRPL. This NFT represents your claim to future payment from the debtor
                 </p>
@@ -74,10 +74,10 @@ export function HowItWorks({ setCurrentPage }: { setCurrentPage: (page: Page) =>
             {/* Step 3 */}
             <div>
               <div className="relative bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-600/50 transition-all h-full flex flex-col">
-                <div className="w-12 h-12 bg-gradient-to-br from-pink-600 to-orange-600 rounded-xl flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-linear-to-br from-pink-600 to-orange-600 rounded-xl flex items-center justify-center mb-4">
                   <TrendingUp className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl text-white mb-3 flex-shrink-0">List on Auction</h3>
+                <h3 className="text-xl text-white mb-3 shrink-0">List on Auction</h3>
                 <p className="text-gray-400 text-sm flex-grow">
                   Investors bid on your NFT in RLUSD. Highest bidder gets the NFT and future payout rights
                 </p>
@@ -90,10 +90,10 @@ export function HowItWorks({ setCurrentPage }: { setCurrentPage: (page: Page) =>
             {/* Step 4 */}
             <div>
               <div className="relative bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-600/50 transition-all h-full flex flex-col">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-600 to-red-600 rounded-xl flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-linear-to-br from-orange-600 to-red-600 rounded-xl flex items-center justify-center mb-4">
                   <Lock className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl text-white mb-3 flex-shrink-0">Get Paid Now</h3>
+                <h3 className="text-xl text-white mb-3 shrink-0">Get Paid Now</h3>
                 <p className="text-gray-400 text-sm flex-grow">
                   Receive RLUSD instantly from the winning investor (at a discount). They'll collect full amount at maturity
                 </p>
@@ -122,10 +122,10 @@ export function HowItWorks({ setCurrentPage }: { setCurrentPage: (page: Page) =>
             {/* Step 1 */}
             <div>
               <div className="relative bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-purple-600/50 transition-all h-full flex flex-col">
-                <div className="w-12 h-12 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-xl flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-linear-to-br from-cyan-600 to-blue-600 rounded-xl flex items-center justify-center mb-4">
                   <Users className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl text-white mb-3 flex-shrink-0">Browse Auctions</h3>
+                <h3 className="text-xl text-white mb-3 shrink-0">Browse Auctions</h3>
                 <p className="text-gray-400 text-sm flex-grow">
                   Explore verified invoice NFTs with detailed information and risk assessments
                 </p>
@@ -138,10 +138,10 @@ export function HowItWorks({ setCurrentPage }: { setCurrentPage: (page: Page) =>
             {/* Step 2 */}
             <div>
               <div className="relative bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-purple-600/50 transition-all h-full flex flex-col">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-linear-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center mb-4">
                   <TrendingUp className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl text-white mb-3 flex-shrink-0">Place Bids</h3>
+                <h3 className="text-xl text-white mb-3 shrink-0">Place Bids</h3>
                 <p className="text-gray-400 text-sm flex-grow">
                   Submit competitive bids in RLUSD stablecoin for invoices that match your criteria
                 </p>
@@ -154,10 +154,10 @@ export function HowItWorks({ setCurrentPage }: { setCurrentPage: (page: Page) =>
             {/* Step 3 */}
             <div>
               <div className="relative bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-purple-600/50 transition-all h-full flex flex-col">
-                <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-linear-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center mb-4">
                   <Shield className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl text-white mb-3 flex-shrink-0">Win Auction</h3>
+                <h3 className="text-xl text-white mb-3 shrink-0">Win Auction</h3>
                 <p className="text-gray-400 text-sm flex-grow">
                   Win the auction and own the NFT. You now have the right to collect from debtor at maturity
                 </p>
@@ -170,10 +170,10 @@ export function HowItWorks({ setCurrentPage }: { setCurrentPage: (page: Page) =>
             {/* Step 4 */}
             <div>
               <div className="relative bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-purple-600/50 transition-all h-full flex flex-col">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-linear-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center mb-4">
                   <Zap className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl text-white mb-3 flex-shrink-0">Collect Payout</h3>
+                <h3 className="text-xl text-white mb-3 shrink-0">Collect Payout</h3>
                 <p className="text-gray-400 text-sm flex-grow">
                   At maturity, debtor pays you the full invoice amount in RLUSD. You earn the discount as profit
                 </p>
@@ -186,7 +186,7 @@ export function HowItWorks({ setCurrentPage }: { setCurrentPage: (page: Page) =>
       {/* Technology Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 relative">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-3xl p-8 lg:p-12 relative overflow-hidden">
+          <div className="bg-linear-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-3xl p-8 lg:p-12 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl"></div>
             
@@ -200,7 +200,7 @@ export function HowItWorks({ setCurrentPage }: { setCurrentPage: (page: Page) =>
 
               <div className="grid md:grid-cols-3 gap-8">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-linear-to-br from-blue-600 to-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Zap className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-xl text-white mb-2">3-5 Seconds</h3>
@@ -208,7 +208,7 @@ export function HowItWorks({ setCurrentPage }: { setCurrentPage: (page: Page) =>
                 </div>
 
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-linear-to-br from-purple-600 to-purple-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Coins className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-xl text-white mb-2">$0.0002</h3>
@@ -216,7 +216,7 @@ export function HowItWorks({ setCurrentPage }: { setCurrentPage: (page: Page) =>
                 </div>
 
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-pink-600 to-pink-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-linear-to-br from-pink-600 to-pink-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Shield className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-xl text-white mb-2">100% Secure</h3>
@@ -240,7 +240,7 @@ export function HowItWorks({ setCurrentPage }: { setCurrentPage: (page: Page) =>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => setCurrentPage('sign-in')}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all text-lg"
+              className="px-8 py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all text-lg"
             >
               List Your Invoice
             </button>

@@ -105,13 +105,13 @@ export function SignIn({ onSignIn, onNavigateToDemoGenerator }: SignInProps) {
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center">
+            <div className="w-16 h-16 bg-linear-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center">
               <Lock className="w-8 h-8 text-white" />
             </div>
           </div>
           
           <h1 className="text-4xl lg:text-5xl mb-4 text-white">
-            Sign In to <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">RLFactor</span>
+            Sign In to <span className="bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">RLFactor</span>
           </h1>
           <p className="text-xl text-gray-400">Enter your XRPL wallet seed to continue</p>
         </div>
@@ -150,7 +150,7 @@ export function SignIn({ onSignIn, onNavigateToDemoGenerator }: SignInProps) {
           <button
             type="submit"
             disabled={isValidating}
-            className="w-full py-3 rounded-lg text-white font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 rounded-lg text-white font-medium bg-linear-to-r from-blue-600 to-purple-600 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isValidating ? 'Validating...' : 'Sign In'}
           </button>

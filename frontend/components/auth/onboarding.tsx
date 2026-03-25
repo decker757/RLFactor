@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Building2, TrendingUp, ArrowRight, CheckCircle, Copy, Check, AlertCircle } from 'lucide-react';
 import { formatPublicKey } from '../../utils/xrpl-utils';
 
-export type UserRole = 'investor' | 'establishment';
+export type UserRole = 'investor' | 'business';
 
 interface OnboardingProps {
   publicKey: string;
@@ -64,7 +64,7 @@ export function Onboarding({ publicKey, onComplete }: OnboardingProps) {
           </div>
           
           <h1 className="text-4xl lg:text-5xl mb-4 text-white">
-            Welcome to <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">RLFactor</span>
+            Welcome to <span className="bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">RLFactor</span>
           </h1>
           <p className="text-xl text-gray-400 mb-4">
             {step === 'role' ? 'Choose your account type to get started' : 'Tell us a bit about yourself'}
@@ -98,7 +98,7 @@ export function Onboarding({ publicKey, onComplete }: OnboardingProps) {
               className="group relative p-8 bg-gray-900 border-2 border-gray-800 rounded-2xl hover:border-blue-600 transition-all duration-300 text-left"
             >
               <div className="flex flex-col items-start gap-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className="w-16 h-16 bg-linear-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                   <TrendingUp className="w-8 h-8 text-white" />
                 </div>
                 <div>
@@ -116,11 +116,11 @@ export function Onboarding({ publicKey, onComplete }: OnboardingProps) {
 
             {/* Establishment Option */}
             <button
-              onClick={() => handleRoleSelect('establishment')}
+              onClick={() => handleRoleSelect('business')}
               className="group relative p-8 bg-gray-900 border-2 border-gray-800 rounded-2xl hover:border-purple-600 transition-all duration-300 text-left"
             >
               <div className="flex flex-col items-start gap-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className="w-16 h-16 bg-linear-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Building2 className="w-8 h-8 text-white" />
                 </div>
                 <div>
@@ -142,8 +142,8 @@ export function Onboarding({ publicKey, onComplete }: OnboardingProps) {
               <div className="flex items-center gap-4 mb-6">
                 <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
                   selectedRole === 'investor' 
-                    ? 'bg-gradient-to-br from-blue-600 to-blue-700' 
-                    : 'bg-gradient-to-br from-purple-600 to-purple-700'
+                    ? 'bg-linear-to-br from-blue-600 to-blue-700' 
+                    : 'bg-linear-to-br from-purple-600 to-purple-700'
                 }`}>
                   {selectedRole === 'investor' ? (
                     <TrendingUp className="w-6 h-6 text-white" />
@@ -176,7 +176,7 @@ export function Onboarding({ publicKey, onComplete }: OnboardingProps) {
                 {/* RLUSD Trust Line Requirement */}
                 <div className="p-4 bg-amber-950/30 border border-amber-900/50 rounded-lg">
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                    <AlertCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                     <div>
                       <h4 className="text-sm font-medium text-amber-400 mb-2">RLUSD Trust Line Required</h4>
                       <p className="text-xs text-amber-200/70 mb-3 leading-relaxed">
@@ -217,8 +217,8 @@ export function Onboarding({ publicKey, onComplete }: OnboardingProps) {
                 type="submit"
                 className={`w-full py-3 rounded-lg text-white font-medium transition-opacity hover:opacity-90 ${
                   selectedRole === 'investor'
-                    ? 'bg-gradient-to-r from-blue-600 to-blue-700'
-                    : 'bg-gradient-to-r from-purple-600 to-purple-700'
+                    ? 'bg-linear-to-r from-blue-600 to-blue-700'
+                    : 'bg-linear-to-r from-purple-600 to-purple-700'
                 }`}
               >
                 Complete Setup

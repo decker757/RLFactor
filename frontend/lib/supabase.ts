@@ -31,7 +31,7 @@ export const isSupabaseConfigured = isConfigured;
 // Database Types (matching your schema)
 export interface User {
   publicKey: string;
-  role: 'investor' | 'establishment';
+  role: 'investor' | 'business' | 'admin';
   username: string;
 }
 

@@ -156,7 +156,7 @@ export function ListTokenModal({
             <button
               type="submit"
               disabled={isSubmitting || !formData.listingPrice || !formData.auctionExpiry || !formData.walletSeed}
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-3 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Listing...' : 'List Token'}
             </button>

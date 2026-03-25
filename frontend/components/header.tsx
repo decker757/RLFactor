@@ -28,7 +28,7 @@ export function Header({
             onClick={() => setCurrentPage('home')}
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-linear-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
               <Layers className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-semibold text-white">RLFactor</span>
@@ -95,7 +95,7 @@ export function Header({
               <>
                 <button 
                   onClick={onSignIn}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                  className="px-4 py-2 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity"
                 >
                   Sign In
                 </button>

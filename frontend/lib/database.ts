@@ -11,7 +11,7 @@ function checkSupabaseConfig() {
 // USER OPERATIONS
 // ==========================================
 
-export async function createUser(publicKey: string, username: string, role: 'investor' | 'establishment') {
+export async function createUser(publicKey: string, username: string, role: 'investor' | 'business') {
   checkSupabaseConfig();
   const { data, error } = await supabase
     .from('USER')

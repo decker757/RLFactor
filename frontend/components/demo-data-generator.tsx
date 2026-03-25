@@ -32,8 +32,8 @@ export function DemoDataGenerator({ onBackToSignIn }: DemoDataGeneratorProps) {
       const users = [
         { privateKey: DEMO_KEYS.investor1, username: 'Alice Investor', role: 'investor' as const },
         { privateKey: DEMO_KEYS.investor2, username: 'Bob Investor', role: 'investor' as const },
-        { privateKey: DEMO_KEYS.establishment1, username: 'Acme Corp', role: 'establishment' as const },
-        { privateKey: DEMO_KEYS.establishment2, username: 'TechStart Inc', role: 'establishment' as const }
+        { privateKey: DEMO_KEYS.establishment1, username: 'Acme Corp', role: 'business' as const },
+        { privateKey: DEMO_KEYS.establishment2, username: 'TechStart Inc', role: 'business' as const }
       ];
 
       for (const user of users) {
@@ -232,12 +232,12 @@ export function DemoDataGenerator({ onBackToSignIn }: DemoDataGeneratorProps) {
 
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center">
+            <div className="w-16 h-16 bg-linear-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center">
               <Database className="w-8 h-8 text-white" />
             </div>
           </div>
           <h1 className="text-4xl lg:text-5xl mb-4 text-white">
-            Demo Data <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Generator</span>
+            Demo Data <span className="bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Generator</span>
           </h1>
           <p className="text-xl text-gray-400">Populate your database with sample accounts and NFTs</p>
         </div>
@@ -248,7 +248,7 @@ export function DemoDataGenerator({ onBackToSignIn }: DemoDataGeneratorProps) {
             <button
               onClick={generateDemoData}
               disabled={isGenerating || isClearing}
-              className="flex-1 py-3 px-6 rounded-lg text-white font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 py-3 px-6 rounded-lg text-white font-medium bg-linear-to-r from-blue-600 to-purple-600 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isGenerating ? (
                 <>
@@ -288,9 +288,9 @@ export function DemoDataGenerator({ onBackToSignIn }: DemoDataGeneratorProps) {
               status.type === 'error' ? 'bg-red-950/30 border-red-900/50 text-red-400' :
               'bg-blue-950/30 border-blue-900/50 text-blue-400'
             } flex items-start gap-2`}>
-              {status.type === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" /> :
-               status.type === 'error' ? <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" /> :
-               <Loader2 className="w-5 h-5 flex-shrink-0 mt-0.5 animate-spin" />}
+              {status.type === 'success' ? <CheckCircle className="w-5 h-5 shrink-0 mt-0.5" /> :
+               status.type === 'error' ? <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" /> :
+               <Loader2 className="w-5 h-5 shrink-0 mt-0.5 animate-spin" />}
               <span>{status.message}</span>
             </div>
           )}
@@ -363,7 +363,7 @@ ALTER TABLE "AUCTIONBIDS" DISABLE ROW LEVEL SECURITY;`}
           <h2 className="text-xl font-semibold text-white mb-4">What Gets Created:</h2>
           <div className="space-y-3 text-gray-300">
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-blue-600/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-6 h-6 rounded-full bg-blue-600/20 flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-sm text-blue-400">1</span>
               </div>
               <div>
@@ -372,7 +372,7 @@ ALTER TABLE "AUCTIONBIDS" DISABLE ROW LEVEL SECURITY;`}
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-blue-600/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-6 h-6 rounded-full bg-blue-600/20 flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-sm text-blue-400">2</span>
               </div>
               <div>
@@ -381,7 +381,7 @@ ALTER TABLE "AUCTIONBIDS" DISABLE ROW LEVEL SECURITY;`}
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-blue-600/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-6 h-6 rounded-full bg-blue-600/20 flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-sm text-blue-400">3</span>
               </div>
               <div>
@@ -390,7 +390,7 @@ ALTER TABLE "AUCTIONBIDS" DISABLE ROW LEVEL SECURITY;`}
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-blue-600/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-6 h-6 rounded-full bg-blue-600/20 flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-sm text-blue-400">4</span>
               </div>
               <div>

@@ -40,7 +40,7 @@ export function IssueTokenModal({
         const users = await getAllUsers();
         // Filter only establishment role users AND exclude current user
         const establishmentUsers = users.filter(
-          user => user.role === 'establishment' && user.publicKey !== currentUserPublicKey
+          user => user.role === 'business' && user.publicKey !== currentUserPublicKey
         );
         setEstablishments(establishmentUsers);
       } catch (error) {
@@ -201,7 +201,7 @@ export function IssueTokenModal({
             <button
               type="submit"
               disabled={isSubmitting || !formData.invoiceNumber || !formData.amount || !formData.maturityDate || !formData.creditorPublicKey}
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Issuing...' : 'Issue Token'}
             </button>

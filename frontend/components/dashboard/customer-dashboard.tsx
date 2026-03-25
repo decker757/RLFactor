@@ -222,7 +222,7 @@ export function CustomerDashboard({
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl lg:text-4xl mb-2 text-white">
-            Welcome back, <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{username}</span>
+            Welcome back, <span className="bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{username}</span>
           </h1>
           <p className="text-gray-400">Manage your portfolio and track your investments</p>
         </div>
@@ -264,7 +264,7 @@ export function CustomerDashboard({
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 mb-8">
+        <div className="bg-linear-to-r from-blue-600 to-purple-600 rounded-xl p-6 mb-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
               <h3 className="text-white text-xl mb-1">Discover New Opportunities</h3>
@@ -390,7 +390,7 @@ export function CustomerDashboard({
                         <button
                           onClick={() => handlePayAndClaim(wonAuction)}
                           disabled={isPaying}
-                          className="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          className="w-full px-6 py-3 bg-linear-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                           {isPaying ? (
                             <>Processing Payment...</>
@@ -414,7 +414,7 @@ export function CustomerDashboard({
                   </p>
                   <button
                     onClick={onViewMarketplace}
-                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                    className="px-6 py-3 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity"
                   >
                     Browse Marketplace
                   </button>
@@ -496,7 +496,7 @@ export function CustomerDashboard({
                   <p className="text-gray-400 mb-4">No active bids</p>
                   <button
                     onClick={onViewMarketplace}
-                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                    className="px-6 py-3 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity"
                   >
                     Start Bidding
                   </button>
@@ -558,7 +558,7 @@ export function CustomerDashboard({
                           <button
                             onClick={() => handleCashCheck(payment)}
                             disabled={cashingCheckFor === payment.payment_id}
-                            className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-6 py-3 bg-linear-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {cashingCheckFor === payment.payment_id
                               ? 'Cashing Check...'
